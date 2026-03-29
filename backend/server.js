@@ -22,25 +22,26 @@ app.get('/api/messages', async (req, res) => {
 // POST a new message to the real database
 app.post('/api/messages', async (req, res) => {
   const { text } = req.body;
+  console.log("User sent:", text);
 
-  // 1. Save User Message to Supabase
-  const { data: userMsg, error: userErr } = await supabase
-    .from('messages')
-    .insert([{ text, role: 'user' }]) // Added a 'role' column
-    .select();
+  try {
+    // Try 'gemini-1.5-flash' or 'gemini-1.5-pro'
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    // Explicitly call the content generation
+    const result = await model.generateContent(text);
+    const response = await result.response;
+    const aiResponse = response.text();
 
-  // 2. Talk to the AI
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const result = await model.generateContent(text);
-  const aiResponse = result.response.text();
+    console.log("AI says:", aiResponse);
 
-  // 3. Save AI Message to Supabase
-  const { data: aiMsg, error: aiErr } = await supabase
-    .from('messages')
-    .insert([{ text: aiResponse, role: 'bot' }])
-    .select();
-
-  res.json(aiMsg[0]); // Send the bot's response back to the UI
+    // ... your Supabase save logic here ...
+    
+    res.json({ text: aiResponse, role: 'bot' });
+  } catch (error) {
+    console.error("Detailed AI Error:", error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // DELETE a message by its ID
