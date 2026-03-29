@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 // Replace the URL with your actual Render URL after you deploy
-const API_BASE_URL = import.meta.env.VITE_API_URL || '${API_BASE_URL}';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -8,14 +8,14 @@ function App() {
 
   // Step 1: Ask the server for messages when the app opens
   useEffect(() => {
-    fetch('${API_BASE_URL}/api/messages')
+    fetch(`${API_BASE_URL}/api/messages`)
       .then(res => res.json())
       .then(data => setMessages(data));
   }, []);
 
   // Step 2: Send a new message to the server
   const sendToServer = async () => {
-    const response = await fetch('${API_BASE_URL}/api/messages', {
+    const response = await fetch(`${API_BASE_URL}/api/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text })
