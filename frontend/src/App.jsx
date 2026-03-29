@@ -54,18 +54,27 @@ return (
 
       {/* Input Area */}
       <div className="flex gap-3 mb-10 bg-slate-800 p-4 rounded-2xl shadow-2xl border border-slate-700">
-        <input 
-          className="flex-1 bg-slate-700 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none text-white placeholder-slate-400"
-          value={text} 
-          onChange={(e) => setText(e.target.value)} 
-          placeholder="What's on your mind?"
-        />
-        <button 
-          className="bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-900/20"
-          onClick={sendToServer}
-        >
-          Send
-        </button>
+        {/* Change the <div> to a <form> and add onSubmit */}
+<form 
+  onSubmit={(e) => {
+    e.preventDefault(); // This stops the page from refreshing
+    sendToServer();
+  }}
+  className="flex gap-3 mb-10 bg-slate-800 p-4 rounded-2xl shadow-2xl border border-slate-700"
+>
+  <input 
+    className="flex-1 bg-slate-700 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none text-white placeholder-slate-400"
+    value={text} 
+    onChange={(e) => setText(e.target.value)} 
+    placeholder="What's on your mind?"
+  />
+  <button 
+    type="submit" // Ensure this says type="submit"
+    className="bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-900/20"
+  >
+    Send
+  </button>
+</form>
       </div>
 
       {/* Message Feed */}
