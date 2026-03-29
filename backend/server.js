@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
 
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -18,20 +21,26 @@ app.get('/api/messages', async (req, res) => {
 
 // POST a new message to the real database
 app.post('/api/messages', async (req, res) => {
-  console.log("Attempting to save:", req.body.text); // Audit 1
+  const { text } = req.body;
 
-  const { data, error } = await supabase
+  // 1. Save User Message to Supabase
+  const { data: userMsg, error: userErr } = await supabase
     .from('messages')
-    .insert([{ text: req.body.text }])
+    .insert([{ text, role: 'user' }]) // Added a 'role' column
     .select();
 
-  if (error) {
-    console.error("Supabase Error:", error.message); // Audit 2
-    return res.status(500).json(error);
-  }
+  // 2. Talk to the AI
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const result = await model.generateContent(text);
+  const aiResponse = result.response.text();
 
-  console.log("Saved Successfully:", data[0]); // Audit 3
-  res.json(data[0]);
+  // 3. Save AI Message to Supabase
+  const { data: aiMsg, error: aiErr } = await supabase
+    .from('messages')
+    .insert([{ text: aiResponse, role: 'bot' }])
+    .select();
+
+  res.json(aiMsg[0]); // Send the bot's response back to the UI
 });
 
 // DELETE a message by its ID

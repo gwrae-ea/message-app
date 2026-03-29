@@ -80,19 +80,20 @@ return (
       {/* Message Feed */}
       <div className="space-y-4">
         {messages.map(m => (
-          <div 
-            key={m.id} 
-            className="group flex justify-between items-center bg-slate-800/50 border border-slate-700 p-5 rounded-2xl hover:border-blue-500/50 hover:bg-slate-800 transition-all shadow-sm"
-          >
-            <span className="text-lg text-slate-100 font-medium">{m.text}</span>
-            <button 
-              onClick={() => deleteMessage(m.id)} 
-              className="opacity-0 group-hover:opacity-100 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition-all"
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+  <div 
+    key={m.id} 
+    className={`p-4 rounded-2xl max-w-[80%] ${
+      m.role === 'bot' 
+        ? 'bg-blue-600 self-start' // Bot bubbles on the left
+        : 'bg-slate-700 self-end ml-auto' // User bubbles on the right
+    }`}
+  >
+    <p className="text-sm font-bold mb-1">
+      {m.role === 'bot' ? '🤖 AI' : '👤 You'}
+    </p>
+    {m.text}
+  </div>
+))}
         
         {messages.length === 0 && (
           <p className="text-center text-slate-500 mt-10 italic">No messages yet. Be the first!</p>
